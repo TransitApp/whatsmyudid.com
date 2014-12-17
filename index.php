@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<title>What's my UDID?</title>
+	<meta name="description" content="Dead-simple tutorial on how to get your iPhone/iPad UDID.">
+	<meta name="viewport" id="viewport" content="maximum-scale=1" />
+
+
+<style>
+	* {	
+		font-weight: normal;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	a {
+		color: #000;
+	}
+	
+	a:hover {
+		color: black;
+		background: yellow;
+	}
+
+	body, html {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	
+	#window {
+		background: url('itunes.png') no-repeat center bottom;
+		overflow: hidden;
+		position: absolute;
+		top: 220px;
+		width: 1014px;
+		height: 601px;
+		left: 50%;
+		margin: 0 0 0 -507px;
+		opacity: 0;
+		-webkit-transform: scale(0.8);
+		-moz-transform: scale(0.8);
+		-webkit-transition: all 0.3s ease-out;
+		-moz-transition: all 0.3s ease-out;
+	}
+	
+	#window.visible {
+		opacity: 1;
+		-webkit-transform: scale(1);
+		-moz-transform: scale(1);
+	}
+	
+	#cursor {
+		background: url('cursor.png') no-repeat 0 0;
+		width: 84px;
+		height: 121px;
+		position: absolute;
+		bottom: -200px;
+		right: 0;
+		-webkit-transition: all 0.5s ease-out;
+		-moz-transition: all 0.5s ease-out;
+	}
+	
+	#cursor.away {
+		bottom: -200px;
+		right: 200px;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	#cursor.moved {
+		bottom: 20px;
+		right: 300px;
+	}
+	
+	#cursor.device {
+		bottom: 186px;
+		right: 831px;
+	}
+	
+	#cursor.device_clicked {
+		bottom: 184px;
+		right: 831px;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	#cursor.device_released {
+		bottom: 186px;
+		right: 831px;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	
+	#cursor.udid {
+		bottom: 224px;
+		right: 315px;
+	}
+	
+	#cursor.udid_clicked {
+		bottom: 222px;
+		right: 315px;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	#cursor.udid_released {
+		bottom: 224px;
+		right: 315px;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	#cursor.udid_hidden {
+		bottom: 224px;
+		right: 315px;
+		opacity: 0;
+	}
+	
+	
+	
+	#udid {
+		background: url('udid.png') no-repeat 0 0;
+		position: absolute;
+		width: 437px;
+		height: 13px;
+		top: 260px;
+		left: 451px;
+		visibility: hidden;
+	}
+	
+	#device_off, #device_on {
+		width: 173px;
+		height: 34px;
+		position: absolute;
+		left: 33px;
+		top: 283px;
+		visibility: hidden;
+	}
+	
+	#device_off {
+		background: url('device_off.png') no-repeat 0 0;
+	}
+	
+	#device_on {
+		background: url('device_on.png') no-repeat 0 0;
+	}
+	
+	#device_info {
+		background: url('device_info.png') no-repeat 0 0;
+		width: 774px;
+		height: 448px;
+		position: absolute;
+		left: 207px;
+		top: 81px;
+		visibility: hidden;
+	}
+
+	h1 {
+		font-family: "HelveticaNeue-Light", "Helvetica";
+		font-size: 34px;
+		margin: 20px 0 5px 0;
+		width: 800px;
+		position: absolute;
+		left: 50%;
+		top: 70px;
+		margin: 0 0 0 -400px;
+		text-align: center;
+	}
+	
+	h1 span {
+		font-family: "HelveticaNeue-Bold", "Helvetica Bold", "Helvetica";
+	}
+
+
+	h2 {
+		font-family: "HelveticaNeue-Light", "Helvetica";
+		font-size: 18px;
+		width: 600px;
+		position: absolute;
+		top: 120px;
+		left: 50%;
+		margin: 0 0 0 -300px;
+		color: rgb(120,120,120);
+		text-align: center;
+		opacity: 0;
+		-webkit-transition: all 0.3s ease-out;
+		-moz-transition: all 0.3s ease-out;
+	}
+	
+	h2.away {
+		top: 120px;
+		left: 50%;
+		opacity: 0;
+		-webkit-transition: none;
+		-moz-transition: none;
+	}
+	
+	h2.visible {
+		opacity: 1;
+		top: 140px;
+	}
+	
+	h2.hidden {
+		opacity: 0;
+		top: 160px;
+	}
+	
+	::-moz-selection {
+		color: black;
+		background: yellow;
+	}
+	
+	::selection {
+		color: black;
+		background: yellow;
+	}
+	
+	
+</style>
+
+
+<script type="text/javascript">
+	
+	function reset() {
+		document.getElementById('window').removeAttribute("class");
+		document.getElementById('device_off').setAttribute("style", "visibility:hidden");
+		document.getElementById('device_on').setAttribute("style", "visibility:hidden");
+		document.getElementById('device_info').setAttribute("style", "visibility:hidden");
+		document.getElementById('udid').setAttribute("style", "visibility:hidden");
+		document.getElementById('step0').setAttribute("class", "away");
+		document.getElementById('step1').setAttribute("class", "away");
+		document.getElementById('step2').setAttribute("class", "away");
+		document.getElementById('step3').setAttribute("class", "away");
+		document.getElementById('step4').setAttribute("class", "away");
+		document.getElementById('step5').setAttribute("class", "away");
+		document.getElementById('step6').setAttribute("class", "away");
+	}
+	
+	function step0() {
+		document.getElementById('step0').setAttribute("class", "visible");
+	}
+	
+	function step1() {
+		reset();
+		
+		document.getElementById('window').setAttribute("class", "visible");
+		document.getElementById('step0').setAttribute("class", "hidden");
+		document.getElementById('step1').setAttribute("class", "visible");
+		document.getElementById('cursor').setAttribute("class", "away");
+	}
+	
+	function step2() {
+		document.getElementById('step1').setAttribute("class", "hidden");
+		document.getElementById('step2').setAttribute("class", "visible");
+		document.getElementById('device_off').setAttribute("style", "visibility:visible");
+	}
+	
+	function step3() {
+		document.getElementById('step2').setAttribute("class", "hidden");
+		document.getElementById('step3').setAttribute("class", "visible");
+		document.getElementById('cursor').setAttribute("class", "device");
+		setTimeout(step3b, 800);
+	}
+	
+	function step3b() {
+		document.getElementById('cursor').setAttribute("class", "device_clicked");
+		document.getElementById('device_on').setAttribute("style", "visibility:visible");
+		document.getElementById('device_info').setAttribute("style", "visibility:visible");
+		setTimeout(step3c, 100);
+	}
+	
+	function step3c() {
+		document.getElementById('cursor').setAttribute("class", "device_released");
+	}
+	
+	function step4() {
+		document.getElementById('step3').setAttribute("class", "hidden");
+		document.getElementById('step4').setAttribute("class", "visible");
+		document.getElementById('cursor').setAttribute("class", "udid");
+		setTimeout(step4b, 800);
+	}
+	
+	function step4b() {
+		document.getElementById('cursor').setAttribute("class", "udid_clicked");
+		document.getElementById('udid').setAttribute("style", "visibility:visible");
+		setTimeout(step4c, 100);
+	}
+	
+	function step4c() {
+		document.getElementById('cursor').setAttribute("class", "udid_released");
+		setTimeout(step4d, 1500);
+	}
+	
+	function step4d() {
+		document.getElementById('step4').setAttribute("class", "hidden");
+		document.getElementById('step5').setAttribute("class", "visible");
+		setTimeout(step4e, 200);
+		setTimeout(step4f, 4000);
+	}
+	
+	function step4e() {
+		document.getElementById('cursor').setAttribute("class", "udid_hidden");
+	}
+	
+	function step4f() {
+		document.getElementById('step5').setAttribute("class", "hidden");
+		document.getElementById('step6').setAttribute("class", "visible");
+	}
+
+	
+
+</script>
+
+</head>
+
+<body onload="setTimeout(step0, 0);">
+
+
+<h1>So an iOS dev asked you for your <span>UDID</span>.</h1>
+
+<h2 id="step6"><a href="javascript:step1()">Play again</a> · Dead-simple tutorial by <a href="http://thetransitapp.com">The Transit App</a></h2>
+<h2 id="step5">&#8984;+C will copy it to the clipboard. Paste it anywhere!</h2>
+<h2 id="step4">4. Click on the device serial number to reveal its UDID.</h2>
+<h2 id="step3">3. Select it from the sources column. <a href="javascript:step4()">Ok..</a></h2>
+<h2 id="step2">2. Connect your iOS device to your computer. <a href="javascript:step3()">Easy. Next?</a></h2>
+<h2 id="step1">1. Open iTunes. <a href="javascript:step2()">Ok, then?</a></h2>
+<h2 id="step0">Yes. <a href="javascript:step1()">How do I find it?</a></h2>
+
+
+<div id="window">
+	<div id="device_off"></div>
+	<div id="device_on"></div>
+	<div id="device_info"></div>
+	<div id="udid"></div>
+	<div id="cursor"></div>
+</div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-4576118-18']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+    var t   = document.createElement('script');
+    t.type  = 'text/javascript';
+    t.async = true;
+    t.id    = 'gauges-tracker';
+    t.setAttribute('data-site-id', '4e6fabf6f5a1f55ea8000001');
+    t.src = '//secure.gaug.es/track.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(t, s);
+  })();
+</script>
+
+</body>
+</html>
